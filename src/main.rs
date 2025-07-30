@@ -13,7 +13,7 @@ struct Args {
     #[clap(short, long)]
     destination: Option<PathBuf>,
     /// The platform to target during compilation (see: https://rust-gpu.github.io/rust-gpu/book/platform-support.html)
-    #[clap(short, long, default_value = "spirv-unknown-spv1.6")]
+    #[clap(short, long, default_value = "spirv-unknown-vulkan1.4")]
     target: String,
     /// Spir-V module extension to enable for the shader
     #[clap(short, long)]
