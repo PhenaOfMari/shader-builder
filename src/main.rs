@@ -25,12 +25,14 @@ struct Args {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cargo_home = env!("CARGO_HOME");
-    env::set_var("RUSTUP_TOOLCHAIN", "nightly-2024-11-22");
-    env::set_var("LD_LIBRARY_PATH", Path::new(cargo_home).join("lib"));
+    unsafe {
+        env::set_var("RUSTUP_TOOLCHAIN", "nightly-2025-06-23");
+        env::set_var("LD_LIBRARY_PATH", Path::new(cargo_home).join("lib"));
+    }
     let args = Args::parse();
     let current_dir = env::current_dir()?;
     let source_path = current_dir.join(args.source);
-    
+
     let builder = SpirvBuilder::new(source_path, args.target);
     let builder = args.extension.iter().fold(builder, |builder, extension| {
         builder.extension(extension)
@@ -43,7 +45,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     });
     let result = builder.build()?;
-    
+
     if let Some(destination) = args.destination {
         let artifact_path = result.module.unwrap_single();
         let artifact_name = artifact_path.file_name().unwrap();

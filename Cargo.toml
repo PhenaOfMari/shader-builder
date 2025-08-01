@@ -1,11 +1,11 @@
 [package]
 name = "shader-builder"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-clap = { version = "4.5.40", features = ["derive"] }
-spirv-builder = { git = "https://github.com/rust-gpu/rust-gpu" }
+clap = { version = "4.5.42", features = ["derive"] }
+spirv-builder = { git = "https://github.com/rust-gpu/rust-gpu", rev = "cf59e541ae1d53926d2e62739f6050483e653be0", default-features = false, features = ["use-installed-tools"] }
 
 [profile.release.build-override]
 opt-level = 3

@@ -1,5 +1,5 @@
 SCRIPT_DIR=$(dirname "$(realpath "$0")")
-TOOLCHAIN="nightly-2024-11-22"
+TOOLCHAIN="nightly-2025-06-23"
 LIB_DIR="$HOME/.cargo/lib"
 
 echo "Installing toolchain..."
