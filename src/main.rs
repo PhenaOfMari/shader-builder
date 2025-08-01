@@ -1,7 +1,7 @@
 use std::{env, fs};
 use std::path::{Path, PathBuf};
 use clap::Parser;
-use spirv_builder::SpirvBuilder;
+use spirv_builder::{ShaderPanicStrategy, SpirvBuilder};
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -20,7 +20,10 @@ struct Args {
     extension: Vec<String>,
     /// Spir-V module capability to enable for the shader
     #[clap(short, long)]
-    capability: Vec<String>
+    capability: Vec<String>,
+    /// Enable debug printf statements
+    #[clap(long)]
+    debug: bool
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -33,7 +36,15 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let current_dir = env::current_dir()?;
     let source_path = current_dir.join(args.source);
 
-    let builder = SpirvBuilder::new(source_path, args.target);
+    let builder = SpirvBuilder::new(source_path, args.target)
+        .shader_panic_strategy(if args.debug {
+            ShaderPanicStrategy::DebugPrintfThenExit {
+                print_inputs: true,
+                print_backtrace: true
+            }
+        } else {
+            ShaderPanicStrategy::SilentExit
+        });
     let builder = args.extension.iter().fold(builder, |builder, extension| {
         builder.extension(extension)
     });
