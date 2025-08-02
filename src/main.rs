@@ -29,32 +29,26 @@ struct Args {
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cargo_home = env!("CARGO_HOME");
     unsafe {
-        env::set_var("RUSTUP_TOOLCHAIN", "nightly-2025-06-23");
         env::set_var("LD_LIBRARY_PATH", Path::new(cargo_home).join("lib"));
     }
     let args = Args::parse();
     let current_dir = env::current_dir()?;
     let source_path = current_dir.join(args.source);
 
-    let builder = SpirvBuilder::new(source_path, args.target)
-        .shader_panic_strategy(if args.debug {
-            ShaderPanicStrategy::DebugPrintfThenExit {
-                print_inputs: true,
-                print_backtrace: true
-            }
-        } else {
-            ShaderPanicStrategy::SilentExit
-        });
-    let builder = args.extension.iter().fold(builder, |builder, extension| {
-        builder.extension(extension)
-    });
-    let builder = args.capability.iter().fold(builder, |builder, capability_str| {
-        if let Ok(capability) = capability_str.parse() {
-            builder.capability(capability)
-        } else {
-            builder
+    let mut builder = SpirvBuilder::new(source_path, args.target);
+    builder.toolchain_overwrite = Some("nightly-2025-06-23".into());
+    if args.debug {
+        builder.shader_panic_strategy = ShaderPanicStrategy::DebugPrintfThenExit {
+            print_inputs: true,
+            print_backtrace: true
         }
-    });
+    }
+    builder.extensions = args.extension;
+    for capability in args.capability {
+        if let Ok(capability) = capability.parse() {
+            builder.capabilities.push(capability)
+        }
+    }
     let result = builder.build()?;
 
     if let Some(destination) = args.destination {
